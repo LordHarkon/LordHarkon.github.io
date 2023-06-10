@@ -8,7 +8,11 @@ export default defineConfig({
   base: "/",
   plugins: [react(), mkcert(), tsconfigPaths()],
   server: {
+    watch: {
+      usePolling: true,
+    },
     host: true,
+    strictPort: true,
     port: 3000,
     // https: true,
   },
