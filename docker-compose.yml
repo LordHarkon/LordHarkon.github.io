@@ -5,3 +5,5 @@ services:
       context: ./
       dockerfile: Dockerfile
     image: result/latest
+    ports:
+      - "3000:3000"
