@@ -1082,7 +1082,7 @@ const GoddessHearthPage = () => {
   }, [selectedOptions, selectedItemOptions, setExportArray]);
 
   return (
-    <div className="ubuntu min-h-screen bg-[url('cream.jpg')]">
+    <div className="ubuntu min-h-screen bg-[url('/cream.jpg')]">
       <SEO
         title="Goddess of the Hearth by Kathiana | Hooshu's Static Interactive CYOAs"
         description="Hooshu's personal website for static non-modular CYOAs. Credits to Kathiana for this CYOA."
