@@ -64,7 +64,7 @@ const Category: FC<Props> = (props) => {
             <div
               id={item.id}
               data-type="item"
-              className={clsx("flex h-min w-[45%] cursor-pointer flex-col items-center p-1 md:w-[30%]", {
+              className={clsx("flex h-min w-[308px] cursor-pointer flex-col items-center p-1", {
                 "bg-blue-400/50": selected,
                 "bg-black/50 text-gray-300": incompatible,
               })}
