@@ -11,10 +11,6 @@ body {
   background-attachment: fixed;
 }
 
-* {
-  font-family: Poppins, sans-serif;
-}
-
 @layer components {
   .custom-scroll-dark::-webkit-scrollbar {
     @apply w-[6px] rounded;
@@ -46,5 +42,17 @@ body {
 
   .custom-scroll-light::-webkit-scrollbar-thumb:hover {
     @apply bg-gray-400;
+  }
+
+  .poppins {
+    font-family: Poppins, sans-serif;
+  }
+
+  .satisfy {
+    font-family: "Satisfy", sans-serif;
+  }
+
+  .ubuntu {
+    font-family: "Ubuntu", sans-serif;
   }
 }

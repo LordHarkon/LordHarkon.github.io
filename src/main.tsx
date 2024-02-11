@@ -1,3 +1,5 @@
+import "@fontsource/satisfy";
+import "@fontsource/ubuntu";
 import { DevTools } from "jotai-devtools";
 import React from "react";
 import ReactDOM from "react-dom/client";
@@ -7,7 +9,8 @@ import { createBrowserRouter } from "react-router-dom";
 import "~/index.css";
 import ErrorPage from "~/pages/ErrorPage";
 import HomePage from "~/pages/HomePage";
-import SuperpowersPage from "~/SuperpowersPage";
+import SuperpowersPage from "~/pages/SuperpowersPage";
+import GoddessHearthPage from "./pages/GoddessHearthPage";
 
 const router = createBrowserRouter([
   {
@@ -18,6 +21,10 @@ const router = createBrowserRouter([
   {
     path: "/superpowers",
     element: <SuperpowersPage />,
+  },
+  {
+    path: "/goddess-hearth",
+    element: <GoddessHearthPage />,
   },
 ]);
 
