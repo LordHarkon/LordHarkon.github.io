@@ -145,12 +145,16 @@ const Category: FC<Props> = (props) => {
               key={props.id + "-" + item.id}
             >
               {/* Image */}
-              <div className="pointer-events-none relative">
-                <img src={item.image} alt={item.name} className="aspect-[1/1] object-cover object-center" />
+              <div className="pointer-events-none relative h-[300px] w-[300px] ">
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="aspect-[1/1] h-[300px] w-[300px] object-cover object-center"
+                />
                 <img
                   src={frameImageUrl}
                   alt="Frame"
-                  className="absolute top-0 aspect-[1/1] object-cover object-center"
+                  className="absolute top-0 aspect-[1/1] h-[300px] w-[300px] object-cover object-center"
                 />
               </div>
 
