@@ -1168,10 +1168,15 @@ const GoddessHearthPage = () => {
                     <li className="font-semibold capitalize">{formatString(cat.category)}</li>
                     <ul className="ml-5 list-disc">
                       {cat.items.map((item) => {
-                        exportList.push(`  - **${capitalizeWords(formatString(item.id))}**`);
+                        exportList.push(
+                          `  - **${capitalizeWords(formatString(item.id))}**${item.count ? ` x${item.count}` : ""}`,
+                        );
                         return (
                           <Fragment key={"export-" + cat.category + "-" + item.id}>
-                            <li className="font-semibold capitalize">{formatString(item.id)}</li>
+                            <li className="font-semibold capitalize">
+                              {formatString(item.id)}
+                              {item.count && <span className="normal-case"> x{item.count}</span>}
+                            </li>
                             {Object.keys(item.options).length > 0 && (
                               <ul className="ml-5 list-disc">
                                 {item.options[item.id]?.map((i) => {
