@@ -87,14 +87,14 @@ const Category: FC<Props> = (props) => {
                   const removeFromSelectedOptions = () => {
                     const temp = selectedOptions.filter((selected) => selected.id !== item.id);
 
-                    // if (item.addMoreCategory) {
-                    //   changeCategoryLimit(
-                    //     item.addMoreCategory!,
-                    //     -item.addMoreCount!,
-                    //     categoriesLimit,
-                    //     setCategoriesLimit,
-                    //   );
-                    // }
+                    if (item.addMoreCategory) {
+                      changeCategoryLimit(
+                        item.addMoreCategory!,
+                        -item.addMoreCount!,
+                        categoriesLimit,
+                        setCategoriesLimit,
+                      );
+                    }
 
                     // If the item is multioption, also remove the selected options for it
                     if (item.multioption) {
