@@ -1200,6 +1200,14 @@ const GoddessHearthPage = () => {
             onClick={() => {
               setSelectedOptions([]);
               setSelectedItemOptions([]);
+              categories.forEach((cat) => {
+                setSelectionLimitByOne(cat.id, cat.itemLimit);
+                cat.items.forEach((item) => {
+                  if (item?.max) {
+                    setSelectionLimitByOne(item.id, item.max as number);
+                  }
+                });
+              });
             }}
           >
             Reset Build
