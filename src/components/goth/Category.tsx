@@ -1,22 +1,11 @@
 import clsx from "clsx";
-import { useAtom } from "jotai";
-import { RESET } from "jotai/utils";
 import { FC, Fragment } from "react";
 import { FaMinus, FaPlus } from "react-icons/fa";
-import {
-  SelectedItemOption,
-  SelectedOption,
-  SelectionLimit,
-  selectedItemOptionsAtom,
-  selectedOptionsAtom,
-  selectionLimitAtom,
-} from "~/atoms";
 import { Category as CategoryType } from "~/pages/GoddessHearthPage";
+import { SelectedItemOption, SelectedOption, useGOTHStore } from "~/store";
 import { CategoryDescription } from "./CategoryDescription";
 
 type Props = CategoryType & {};
-type SetAtom<Args extends unknown[], Result> = (...args: Args) => Result;
-type SetStateActionWithReset<Value> = Value | typeof RESET | ((prev: Value) => Value | typeof RESET);
 
 const frameImageUrl = "https://i.imgur.com/QK3qIcm.png";
 
@@ -24,35 +13,23 @@ function checkIfSelected(selected: SelectedOption[] | SelectedItemOption[], curr
   return selected.filter((sel) => current.includes(sel.id)).length > 0;
 }
 
-export function changeCategoryLimit(
-  category: string,
-  limit: number,
-  categories: SelectionLimit[],
-  setFunction: SetAtom<[SetStateActionWithReset<SelectionLimit[]>], void>,
-) {
-  const temp = [...categories];
-  temp.map((cat) => {
-    if (cat.id === category) {
-      cat.limit += limit;
-    }
-    return cat;
-  });
-  setFunction([...temp]);
-}
-
 const Category: FC<Props> = (props) => {
-  const [selectedOptions, setSelectedOptions] = useAtom(selectedOptionsAtom);
-  const [selectedItemOptions, setSelectedItemOptions] = useAtom(selectedItemOptionsAtom);
-  const [categoriesLimit, setCategoriesLimit] = useAtom(selectionLimitAtom);
+  const selectedOptions = useGOTHStore((state) => state.selectedOptions);
+  const setSelectedOptions = useGOTHStore((state) => state.setSelectedOptions);
+
+  const selectedItemOptions = useGOTHStore((state) => state.selectedItemOptions);
+  const setSelectedItemOptions = useGOTHStore((state) => state.setSelectedItemOptions);
+
+  const selectionLimit = useGOTHStore((state) => state.selectionLimit);
+  const getSelectionLimit = useGOTHStore((state) => state.getSelectionLimit);
+  const addSelectionLimit = useGOTHStore((state) => state.addSelectionLimit);
+  const reduceSelectionLimit = useGOTHStore((state) => state.reduceSelectionLimit);
 
   return (
     <div className="flex flex-col">
       <h1 className="text-center text-4xl font-semibold">{props.title}</h1>
       <CategoryDescription
-        description={props.description.replaceAll(
-          "%LIMIT%",
-          categoriesLimit.find((cl) => cl.id === props.id)?.limit?.toString() || props.itemLimit.toString(),
-        )}
+        description={props.description.replaceAll("%LIMIT%", getSelectionLimit(props.id, props.itemLimit).toString())}
         id={props.id}
       />
       <div className="flex w-full flex-wrap justify-around gap-4 py-4">
@@ -75,7 +52,7 @@ const Category: FC<Props> = (props) => {
                     ?.map((it) => it.count)
                     ?.reduce((p, c) => p! + c!, 0) || 0) +
                     selectedOptions.filter((sel) => sel.category === props.id && !sel?.count).length || 0;
-                const categoryLimit = categoriesLimit.filter((cat) => cat.id === props.id)[0].limit;
+                const categoryLimit = getSelectionLimit(props.id, props.itemLimit);
 
                 // If the child element is clicked, then don't let the user (un)select this option
                 if ((e.target as HTMLDivElement).getAttribute("data-type") === "item") {
@@ -88,12 +65,7 @@ const Category: FC<Props> = (props) => {
                     const temp = selectedOptions.filter((selected) => selected.id !== item.id);
 
                     if (item.addMoreCategory) {
-                      changeCategoryLimit(
-                        item.addMoreCategory!,
-                        -item.addMoreCount!,
-                        categoriesLimit,
-                        setCategoriesLimit,
-                      );
+                      addSelectionLimit(item.addMoreCategory!, item.addMoreCount!);
                     }
 
                     // If the item is multioption, also remove the selected options for it
@@ -115,7 +87,6 @@ const Category: FC<Props> = (props) => {
                     // If the array is already full, remove the first element and add the new one at the end
                     if (used + 1 > categoryLimit) {
                       const [firstElem, ...rest] = selectedOptions.filter((sel) => sel.category === props.id);
-                      console.log("FIRST ELEMENT", firstElem);
                       // If the item is multiselect, remove only 1 from counter, instead of the whole item
                       if (firstElem && firstElem.count && firstElem.count > 1) {
                         setSelectedOptions([
@@ -188,12 +159,7 @@ const Category: FC<Props> = (props) => {
                           ]);
                         }
                         if (item.addMoreCategory) {
-                          changeCategoryLimit(
-                            item.addMoreCategory!,
-                            -item.addMoreCount!,
-                            categoriesLimit,
-                            setCategoriesLimit,
-                          );
+                          reduceSelectionLimit(item.addMoreCategory!, item.addMoreCount!);
                         }
                       }
                     }}
@@ -212,7 +178,7 @@ const Category: FC<Props> = (props) => {
                           ?.map((it) => it.count)
                           ?.reduce((p, c) => p! + c!, 0) || 0) +
                           selectedOptions.filter((sel) => sel.category === props.id && !sel?.count).length || 0;
-                      const categoryLimit = categoriesLimit.filter((cat) => cat.id === props.id)[0].limit;
+                      const categoryLimit = getSelectionLimit(props.id, props.itemLimit);
 
                       if (used + 1 <= categoryLimit) {
                         if (selected) {
@@ -229,12 +195,7 @@ const Category: FC<Props> = (props) => {
                           ]);
                         }
                         if (item.addMoreCategory) {
-                          changeCategoryLimit(
-                            item.addMoreCategory!,
-                            item.addMoreCount!,
-                            categoriesLimit,
-                            setCategoriesLimit,
-                          );
+                          addSelectionLimit(item.addMoreCategory!, item.addMoreCount!);
                         }
                       }
                     }}
@@ -281,7 +242,7 @@ const Category: FC<Props> = (props) => {
                           })}
                           onClick={() => {
                             const selectedOptionsThisItem = selectedItemOptions.filter((sel) => sel.item === item.id);
-                            const itemLimit = categoriesLimit.filter((cat) => cat.id === item.id)[0].limit;
+                            const itemLimit = selectionLimit.filter((cat) => cat.id === item.id)[0].limit;
 
                             // Cannot select if the item itself is not selected.
                             if (!selected) return null;

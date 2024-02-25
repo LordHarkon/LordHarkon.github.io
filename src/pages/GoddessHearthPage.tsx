@@ -1,15 +1,7 @@
-import { useAtom } from "jotai";
 import { Fragment, useEffect, useState } from "react";
-import {
-  SelectedItemOption,
-  selectedItemOptionsAtom,
-  SelectedOption,
-  selectedOptionsAtom,
-  SelectionLimit,
-  selectionLimitAtom,
-} from "~/atoms";
-import CategoryComponent, { changeCategoryLimit } from "~/components/goth/Category";
+import CategoryComponent from "~/components/goth/Category";
 import SEO from "~/components/SEO";
+import { SelectedItemOption, SelectedOption, useGOTHStore } from "~/store";
 
 export type Category = {
   id: string;
@@ -1037,48 +1029,34 @@ function formatChosen(selected: SelectedOption[], options: SelectedItemOption[])
 
 const GoddessHearthPage = () => {
   const [exportArray, setExportArray] = useState<any[]>([]);
-  const exportList = [] as string[];
-  const [selectedOptions, setSelectedOptions] = useAtom(selectedOptionsAtom);
-  const [selectedItemOptions, setSelectedItemOptions] = useAtom(selectedItemOptionsAtom);
-  const [categoriesLimit, setCategoriesLimit] = useAtom(selectionLimitAtom);
-  const catLimits: SelectionLimit[] = [];
-  categories.forEach((cat) => {
-    catLimits.push({
-      id: cat.id,
-      limit: cat.itemLimit,
-    });
-    cat.items.forEach((item) => {
-      if (item?.max)
-        catLimits.push({
-          id: item.id,
-          limit: item.max as number,
-        });
-    });
-  });
+  const exportList: string[] = [];
+
+  const selectedOptions = useGOTHStore((state) => state.selectedOptions);
+  const setSelectedOptions = useGOTHStore((state) => state.setSelectedOptions);
+
+  const selectedItemOptions = useGOTHStore((state) => state.selectedItemOptions);
+  const setSelectedItemOptions = useGOTHStore((state) => state.setSelectedItemOptions);
+
+  const getSelectionLimit = useGOTHStore((state) => state.getSelectionLimit);
+  const setSelectionLimitByOne = useGOTHStore((state) => state.setSelectionLimitByOne);
 
   useEffect(() => {
-    setCategoriesLimit(catLimits);
-  }, []);
-
-  useEffect(() => {
-    setExportArray(formatChosen(selectedOptions, selectedItemOptions));
-    categories.forEach((category) => {
-      selectedOptions.forEach((so) => {
-        const matchingCategory = category.id === so.category;
-        const matchingItem =
-          matchingCategory && category.items.find((item) => item.id === so.id && item.addMoreCategory);
-
-        if (matchingItem) {
-          const { addMoreCategory, addMoreCount, multiselect } = matchingItem;
-
-          if (multiselect) {
-            changeCategoryLimit(addMoreCategory!, addMoreCount! * (so.count || 1), catLimits, setCategoriesLimit);
-          } else {
-            changeCategoryLimit(addMoreCategory!, addMoreCount!, categoriesLimit, setCategoriesLimit);
+    categories.forEach((cat) => {
+      if (!getSelectionLimit(cat.id, 0)) {
+        setSelectionLimitByOne(cat.id, cat.itemLimit);
+      }
+      cat.items.forEach((item) => {
+        if (item?.max) {
+          if (!getSelectionLimit(item.id, 0)) {
+            setSelectionLimitByOne(item.id, item.max as number);
           }
         }
       });
     });
+  }, []);
+
+  useEffect(() => {
+    setExportArray(formatChosen(selectedOptions, selectedItemOptions));
   }, [selectedOptions, selectedItemOptions, setExportArray]);
 
   return (
@@ -1222,6 +1200,14 @@ const GoddessHearthPage = () => {
             onClick={() => {
               setSelectedOptions([]);
               setSelectedItemOptions([]);
+              categories.forEach((cat) => {
+                setSelectionLimitByOne(cat.id, cat.itemLimit);
+                cat.items.forEach((item) => {
+                  if (item?.max) {
+                    setSelectionLimitByOne(item.id, item.max as number);
+                  }
+                });
+              });
             }}
           >
             Reset Build
