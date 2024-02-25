@@ -65,7 +65,7 @@ const Category: FC<Props> = (props) => {
                     const temp = selectedOptions.filter((selected) => selected.id !== item.id);
 
                     if (item.addMoreCategory) {
-                      addSelectionLimit(item.addMoreCategory!, item.addMoreCount!);
+                      reduceSelectionLimit(item.addMoreCategory!, item.addMoreCount!);
                     }
 
                     // If the item is multioption, also remove the selected options for it
@@ -109,6 +109,10 @@ const Category: FC<Props> = (props) => {
                       }
                     } else {
                       setSelectedOptions([...selectedOptions, { category: props.id, id: item.id }]);
+                    }
+
+                    if (item.addMoreCategory) {
+                      addSelectionLimit(item.addMoreCategory!, item.addMoreCount!);
                     }
                   }
                 }
