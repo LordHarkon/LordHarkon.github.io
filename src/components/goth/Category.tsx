@@ -26,7 +26,11 @@ const Category: FC<Props> = (props) => {
   const reduceSelectionLimit = useGOTHStore((state) => state.reduceSelectionLimit);
 
   return (
-    <div className="flex flex-col">
+    <div
+      className={clsx("flex flex-col", {
+        hidden: props.hiddenUnless && !checkIfSelected(selectedOptions, [props.hiddenUnless!]),
+      })}
+    >
       <h1 className="text-center text-4xl font-semibold">{props.title}</h1>
       <CategoryDescription
         description={props.description.replaceAll("%LIMIT%", getSelectionLimit(props.id, props.itemLimit).toString())}
@@ -149,19 +153,29 @@ const Category: FC<Props> = (props) => {
                       // If an incompatible item is selected, don't do anything
                       if (incompatible) return null;
 
+                      let temp = [...selectedOptions];
+
                       if (selected) {
                         if (opt.count! - 1 <= 0) {
-                          setSelectedOptions([
+                          temp = [
                             ...selectedOptions.filter((sel) => sel.category !== props.id),
                             ...selectedOptions.filter((sel) => sel.category === props.id && sel.id !== item.id),
-                          ]);
+                          ];
                         } else {
-                          setSelectedOptions([
+                          temp = [
                             ...selectedOptions.filter((sel) => sel.category !== props.id),
                             ...selectedOptions.filter((sel) => sel.category === props.id && sel.id !== item.id),
                             { category: props.id, id: item.id, count: opt.count! - 1 },
-                          ]);
+                          ];
                         }
+
+                        // If the item should unselect all the items in certain categories
+                        if (item.unselect) {
+                          temp = [...temp.filter((sel) => !item.unselect?.includes(sel.category))];
+                        }
+
+                        setSelectedOptions(temp);
+
                         if (item.addMoreCategory) {
                           reduceSelectionLimit(item.addMoreCategory!, item.addMoreCount!);
                         }
@@ -186,6 +200,7 @@ const Category: FC<Props> = (props) => {
 
                       if (used + 1 <= categoryLimit) {
                         if (selected) {
+                          if (item.max && opt.count! + 1 > item.max) return;
                           setSelectedOptions([
                             ...selectedOptions.filter((sel) => sel.category !== props.id),
                             ...selectedOptions.filter((sel) => sel.category === props.id && sel.id !== item.id),

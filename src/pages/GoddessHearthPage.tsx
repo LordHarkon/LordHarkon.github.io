@@ -9,6 +9,7 @@ export type Category = {
   description: string;
   require?: string[];
   itemLimit: number;
+  hiddenUnless?: string;
   items: CategoryItem[];
 };
 
@@ -249,6 +250,10 @@ const categories: Category[] = [
         description:
           "A village that can either be left empty or which is filled with A.I. inhabitants. They can maintain farms and ranches, or act as general servants. See the village supplement at the end.",
         image: "/GOTH/item-images/village.png",
+        multiselect: true,
+        max: 3,
+        addMoreCategory: "specialties",
+        addMoreCount: 6,
         incompatible: ["void"],
         unselect: ["inhabitants", "technology", "magic", "specialties"],
       },
@@ -756,6 +761,7 @@ const categories: Category[] = [
     description:
       "If you choose to select a village and wish to have it populated by A.I., then I can help you design your perfect village.\n\nThe village size will be approximately 10% of your total area, so if you have 1,000 acres, the village will be 100 acres in size and your total acreage becomes 1,100 acres. The village has whatever aesthetics you wish. For example, you can have a Roman Coliseum beside a Shinto temple. The village can also be divided into multiple villages totaling the same area, and villages can each have their own unique customs/traditions/aesthetics.\n\nIn cases where the village and the house offer similar choices, the house will always be superior and tailored to your tastes while the village provides more generalized features.\n\nSelecting Village multiple times will allow you to select more options. So if the first purchase allows you to select six options, the second will allow twelve and the third will allow eighteen.",
     itemLimit: 0,
+    hiddenUnless: "village",
     items: [],
   },
   {
@@ -764,6 +770,7 @@ const categories: Category[] = [
     description:
       "Choose the type of inhabitants that live in your village. The inhabitants of the village cannot leave your dimension.",
     itemLimit: 1,
+    hiddenUnless: "village",
     require: ["village"],
     items: [
       {
@@ -793,6 +800,7 @@ const categories: Category[] = [
     title: "Technology",
     description: "Choose the level of technology in your village.",
     itemLimit: 1,
+    hiddenUnless: "village",
     require: ["village"],
     items: [
       {
@@ -821,6 +829,7 @@ const categories: Category[] = [
     title: "Magic",
     description: "Choose the level of magic in your village.",
     itemLimit: 1,
+    hiddenUnless: "village",
     require: ["village"],
     items: [
       {
@@ -851,7 +860,8 @@ const categories: Category[] = [
     title: "Specialties",
     description:
       "Choose %LIMIT%.\nYour village comes with a variety of different shops and professions, but here you can select areas where your inhabitants truly excel. Some specialties pair well with others such as theater and music to make musicals. It's not required to purchase both, but if you have both, the final product will be that much more amazing.",
-    itemLimit: 6,
+    itemLimit: 0,
+    hiddenUnless: "village",
     require: ["village"],
     items: [
       {
